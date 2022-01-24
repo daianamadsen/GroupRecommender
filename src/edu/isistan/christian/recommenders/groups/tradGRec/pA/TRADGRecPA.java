@@ -65,6 +65,10 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	//------- RECOMMEND
 	
 	public GRecResult<T> recommend(GRecGroup group, int howMany) throws SURException{
+		return this.recommend(group, howMany, false, false);
+	}
+	
+	public GRecResult<T> recommend(GRecGroup group, int howMany, boolean usePersonality, boolean useRelationships) throws SURException{
 
 		long recommendationTimeTotal = 0;
 		StopWatch timer = new StopWatch();
