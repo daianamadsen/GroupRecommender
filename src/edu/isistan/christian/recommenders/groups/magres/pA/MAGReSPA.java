@@ -130,6 +130,10 @@ public abstract class MAGReSPA <T extends SURItem> extends MAGReS<T> {
 		return buildResult(group, recommendations, recommendationTimeTotal);
 	}
 	
+	public GRecResult<T> recommend(GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, boolean p, boolean r) throws SURException{
+		return this.recommend(group, userAgProfiles, howMany);
+	}
+	
 	//------------------------------- MAGRES CODE
 	
 	protected abstract List<MAGReSPAUserAg<T>> createAgents (GRecGroup group, Set<Set<T>> subsets);

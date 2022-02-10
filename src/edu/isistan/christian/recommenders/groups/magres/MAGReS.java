@@ -41,8 +41,8 @@ public abstract class MAGReS <T extends SURItem> extends GroupRecommender<T>{
 	 * All the agents will use the default profile. This method exists just to comply with the interface
 	 * of the GroupRecommender class
 	 */
-	public GRecResult<T> recommend(GRecGroup group, int howMany) throws SURException{
-		return this.recommend(group, null, howMany);
+	public GRecResult<T> recommend(GRecGroup group, int howMany, boolean usePersonality, boolean useRelationships) throws SURException{
+		return this.recommend(group, null, howMany, usePersonality, useRelationships);
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public abstract class MAGReS <T extends SURItem> extends GroupRecommender<T>{
 	 * @return
 	 * @throws SURException
 	 */
-	public abstract GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany) 
+	public abstract GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, boolean usePersonality, boolean useRelationships) 
 			throws SURException;
 
 }

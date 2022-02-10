@@ -43,11 +43,7 @@ public abstract class GroupRecommender <T extends SURItem>{
 	
 	public abstract boolean canRecommend();
 	
-	public abstract GRecResult<T> recommend(GRecGroup group, int howMany) throws SURException;
-	
-	public GRecResult<T> recommend(GRecGroup group, int howMany, boolean usePersonality, boolean useRelationships) throws SURException {
-		return this.recommend(group, howMany);
-	}
+	public abstract GRecResult<T> recommend(GRecGroup group, int howMany, boolean usePersonality, boolean useRelationships) throws SURException;
 	
 	public abstract void forgetPastRecommendations();
 	

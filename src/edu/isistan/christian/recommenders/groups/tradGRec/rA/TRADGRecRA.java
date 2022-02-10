@@ -76,7 +76,7 @@ public abstract class TRADGRecRA <T extends SURItem> extends TRADGRec<T> {
 		
 		
 		for (SURUser member : group) {
-			singleUserRecommender.forgetPastRecommendations(member); //quizás es muy extremo porque deshace todo lo del usuario, no solo lo que le recomendó //TODO revise this
+			singleUserRecommender.forgetPastRecommendations(member); //quizï¿½s es muy extremo porque deshace todo lo del usuario, no solo lo que le recomendï¿½ //TODO revise this
 		}
 		
 		//Stop the timer
@@ -85,6 +85,10 @@ public abstract class TRADGRecRA <T extends SURItem> extends TRADGRec<T> {
 
 		//Build the result object and return it
 		return buildResult(group, recommendations, recommendationTimeTotal);
+	}
+
+	public GRecResult<T> recommend(GRecGroup group, int howMany, boolean p, boolean r) throws SURException{
+		return this.recommend(group, howMany);
 	}
 
 	//Maybe this method is not needed
