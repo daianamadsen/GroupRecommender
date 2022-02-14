@@ -36,6 +36,10 @@ public abstract class MAGReS <T extends SURItem> extends GroupRecommender<T>{
 		return this.singleUserRecommender.getAmountOfRecommendableItemsTo(user);
 	}
 	
+	public GRecResult<T> recommend(GRecGroup group, int howMany) throws SURException{
+		return this.recommend(group, null, howMany, false, false);
+	}
+	
 	@Override
 	/**
 	 * All the agents will use the default profile. This method exists just to comply with the interface
