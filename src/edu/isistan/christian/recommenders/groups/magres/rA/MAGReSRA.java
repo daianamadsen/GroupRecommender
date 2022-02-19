@@ -122,10 +122,10 @@ public abstract class MAGReSRA <T extends SURItem> extends MAGReS<T>{
 	//TODO IMPLEMENT THIS => this method maybe needs to run a thread so this way will be able to run concurrently
 	public GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany) 
 			throws SURException {
-		return this.recommend(group, userAgProfiles, howMany, false, false);
+		return this.recommend(group, userAgProfiles, howMany, null, null, null);
 	}
 
-	public GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, boolean usePersonality, boolean useRelationships) 
+	public GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) 
 			throws SURException {
 
 		long recommendationTimeTotal = 0;

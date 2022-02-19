@@ -65,10 +65,10 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	//------- RECOMMEND
 	
 	public GRecResult<T> recommend(GRecGroup group, int howMany) throws SURException{
-		return this.recommend(group, howMany, false, false);
+		return this.recommend(group, howMany, null, null, null);
 	}
 	
-	public GRecResult<T> recommend(GRecGroup group, int howMany, boolean usePersonality, boolean useRelationships) throws SURException{
+	public GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURException{
 
 		long recommendationTimeTotal = 0;
 		StopWatch timer = new StopWatch();
@@ -84,7 +84,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 		singleUserRecommender.addUser(groupUser);
 
 		/// We need to get a list of ratings for the group which should be computed using the ratings of the members aggregated with some technique
-		List<SURRating> groupRatings = this.getGroupRatings(group);
+		List<SURRating> groupRatings = this.getGroupRatings(group, assertivenessFactors, cooperativenessFactors, relationshipsFactors);
 
 		//Add all the ratings computed as feedbacks, this recommender will be able to use them to make recommendations
 		//			singleUserRecommender.addRating(groupRatings);
@@ -131,7 +131,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	 * @param gMembers
 	 * @return
 	 */
-	protected List<SURRating> getGroupRatings (GRecGroup group) throws SURInexistentUserException{
+	protected List<SURRating> getGroupRatings (GRecGroup group, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURInexistentUserException{
 		List<SURRating> groupRatings = new ArrayList<>();
 
 		//Get the full list of the items rated by the group members and estimate the group rating
