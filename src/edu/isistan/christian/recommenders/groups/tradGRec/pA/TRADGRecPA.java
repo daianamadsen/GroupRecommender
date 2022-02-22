@@ -142,6 +142,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 
 		//Aggregate the ratings and create a RatableItemFeedback
 		for (T m : allItemsRated){
+			Double totalWeights = 0.0;
 			List<Double> mRatings = new ArrayList<>();
 			List<Double> mCertainty = new ArrayList<>();
 			for (SURUser member : group){
@@ -149,7 +150,16 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 					SURPrediction<T> p = singleUserRecommender.estimatePreference(member, m);
 					if (p.isValid())
 						if (!Double.isNaN(p.getPrediction()) && !Double.isNaN(p.getCertainty())){
-							mRatings.add(singleUserRecommender.estimateUserRating(p));
+							Double estimatedRating = singleUserRecommender.estimateUserRating(p);
+							Double weight = assertivenessFactors.get(member);
+							for (SURUser otherMember : group) {
+								if (otherMember != member) {
+									weight = weight * cooperativenessFactors.get(otherMember);
+									weight = weight * relationshipsFactors.get(member).get(otherMember);
+								}
+							}
+							totalWeights = totalWeights + weight;
+							mRatings.add(estimatedRating * weight);
 							mCertainty.add(p.getCertainty());
 						}
 						else
@@ -161,8 +171,11 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 				}
 
 			}
-
-			double aggregatedRating = aggregationStrategy.aggregate(mRatings);
+			double aggregatedRating = 0.0;
+			for (Double mr : mRatings) {
+				aggregatedRating = aggregatedRating + mr;
+			}
+			aggregatedRating = aggregatedRating / totalWeights;
 			double aggregatedCertainty = aggregationStrategy.aggregate(mCertainty);
 			groupRatings.add(new SURRating(group.getID(), m.getID(), aggregatedRating, aggregatedCertainty));		
 		}
