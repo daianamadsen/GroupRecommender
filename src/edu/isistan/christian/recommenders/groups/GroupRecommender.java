@@ -43,7 +43,7 @@ public abstract class GroupRecommender <T extends SURItem>{
 	
 	public abstract boolean canRecommend();
 	
-	public abstract GRecResult<T> recommend(GRecGroup group, int howMany,HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURException;
+	public abstract GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURException;
 	
 	public abstract void forgetPastRecommendations();
 	
