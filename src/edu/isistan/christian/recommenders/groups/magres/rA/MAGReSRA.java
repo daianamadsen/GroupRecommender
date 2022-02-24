@@ -125,7 +125,7 @@ public abstract class MAGReSRA <T extends SURItem> extends MAGReS<T>{
 		return this.recommend(group, userAgProfiles, howMany, null, null, null);
 	}
 
-	public GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) 
+	public GRecResult<T> recommend (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) 
 			throws SURException {
 
 		long recommendationTimeTotal = 0;

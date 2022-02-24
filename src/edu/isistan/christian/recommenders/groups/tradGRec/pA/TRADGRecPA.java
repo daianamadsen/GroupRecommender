@@ -68,7 +68,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 		return this.recommend(group, howMany, null, null, null);
 	}
 	
-	public GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURException{
+	public GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) throws SURException{
 
 		long recommendationTimeTotal = 0;
 		StopWatch timer = new StopWatch();
@@ -131,7 +131,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	 * @param gMembers
 	 * @return
 	 */
-	protected List<SURRating> getGroupRatings (GRecGroup group, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURInexistentUserException{
+	protected List<SURRating> getGroupRatings (GRecGroup group, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) throws SURInexistentUserException{
 		List<SURRating> groupRatings = new ArrayList<>();
 
 		//Get the full list of the items rated by the group members and estimate the group rating
@@ -151,11 +151,18 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 					if (p.isValid())
 						if (!Double.isNaN(p.getPrediction()) && !Double.isNaN(p.getCertainty())){
 							Double estimatedRating = singleUserRecommender.estimateUserRating(p);
-							Double weight = assertivenessFactors.get(member);
+							Double weight = 1.0;
+							if (assertivenessFactors != null) {
+								weight = weight * assertivenessFactors.get(member);
+							}
 							for (SURUser otherMember : group) {
 								if (otherMember != member) {
-									weight = weight * cooperativenessFactors.get(otherMember);
-									weight = weight * relationshipsFactors.get(member).get(otherMember);
+									if (cooperativenessFactors != null) {
+										weight = weight * cooperativenessFactors.get(otherMember);
+									}
+									if (relationshipsFactors != null) {
+										weight = weight * relationshipsFactors.get(member).get(otherMember);
+									}
 								}
 							}
 							totalWeights = totalWeights + weight;
@@ -172,10 +179,16 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 
 			}
 			double aggregatedRating = 0.0;
-			for (Double mr : mRatings) {
-				aggregatedRating = aggregatedRating + mr;
+			if (assertivenessFactors != null || cooperativenessFactors != null || relationshipsFactors != null) {
+				//Aggregation Strategy: Weighted Average
+				for (Double mr : mRatings) {
+					aggregatedRating = aggregatedRating + mr;
+				}
+				aggregatedRating = aggregatedRating / totalWeights;
+			} else {
+				//Aggregation Strategy: Config Setting
+				aggregatedRating = aggregationStrategy.aggregate(mRatings);
 			}
-			aggregatedRating = aggregatedRating / totalWeights;
 			double aggregatedCertainty = aggregationStrategy.aggregate(mCertainty);
 			groupRatings.add(new SURRating(group.getID(), m.getID(), aggregatedRating, aggregatedCertainty));		
 		}

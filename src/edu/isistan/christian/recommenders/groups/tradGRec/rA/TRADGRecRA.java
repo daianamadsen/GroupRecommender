@@ -87,7 +87,7 @@ public abstract class TRADGRecRA <T extends SURItem> extends TRADGRec<T> {
 		return buildResult(group, recommendations, recommendationTimeTotal);
 	}
 
-	public GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Integer>> relationshipsFactors) throws SURException{
+	public GRecResult<T> recommend(GRecGroup group, int howMany, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) throws SURException{
 		return this.recommend(group, howMany);
 	}
 
