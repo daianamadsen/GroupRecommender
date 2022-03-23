@@ -141,7 +141,7 @@ public abstract class MAGReSRA <T extends SURItem> extends MAGReS<T>{
 		if (userAgProfiles == null || userAgProfiles.isEmpty())
 			agents = createAgents(group);
 		else
-			agents = createAgents(group, userAgProfiles);
+			agents = createAgents(group, userAgProfiles, assertivenessFactors, cooperativenessFactors, relationshipsFactors);
 		
 		logger.info("=> Agents created  ["+agents+"].");
 
@@ -184,6 +184,8 @@ public abstract class MAGReSRA <T extends SURItem> extends MAGReS<T>{
 	protected abstract List<UserAg<T>> createAgents (GRecGroup group);
 	
 	protected abstract List<UserAg<T>> createAgents (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles);
+
+	protected abstract List<UserAg<T>> createAgents (GRecGroup group, HashMap<SURUser, PUMASAgentProfile<T>> userAgProfiles, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors);
 
 	//----------------------------
 	
