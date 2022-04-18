@@ -30,6 +30,9 @@ public abstract class TRADGRecPAConfigs <T extends SURItem> extends GRecConfigs{
 		AGGREGATION_STRATEGY_UL_BETA ("grec.aggregationStrategy.ul.beta"),
 		AGGREGATION_STRATEGY_UL_GAMMA ("grec.aggregationStrategy.ul.gamma"),
 		AGGREGATION_STRATEGY_UL_AV_THRESHOLD ("grec.aggregationStrategy.ul.av_threshold"),
+		AGGREGATION_STRATEGY_PF_BETA ("grec.aggregationStrategy.pf.beta"),
+		AGGREGATION_STRATEGY_PF_GAMMA ("grec.aggregationStrategy.pf.gamma"),
+		AGGREGATION_STRATEGY_PF_DELTA ("grec.aggregationStrategy.pf.delta"),
 		;
 
 		private String propertyName;
@@ -45,6 +48,8 @@ public abstract class TRADGRecPAConfigs <T extends SURItem> extends GRecConfigs{
 	protected SingleUserRecommender<T> singleUserRecommender;
 	protected AggregationStrategy aggregationStrategy;
 	protected AggregationStrategy groupRatingEstimationStrategy;
+
+	protected double pf_beta, pf_gamma, pf_delta;
 
 	public TRADGRecPAConfigs(String configsPath) throws ConfigurationException {
 		loadGeneralConfigs(configsPath);
@@ -89,6 +94,13 @@ public abstract class TRADGRecPAConfigs <T extends SURItem> extends GRecConfigs{
 				break;
 			}
 			
+			this.pf_beta = config.getDouble(GeneralProperties.AGGREGATION_STRATEGY_PF_BETA.getPropertyName());
+			this.pf_gamma = config.getDouble(GeneralProperties.AGGREGATION_STRATEGY_PF_GAMMA.getPropertyName());
+			this.pf_delta = config.getDouble(GeneralProperties.AGGREGATION_STRATEGY_PF_DELTA.getPropertyName());
+			
+			if (pf_beta + pf_gamma + pf_delta >= 1)
+					throw new IllegalArgumentException ("beta, gamma and delta parameters must add up to less than 1");
+				
 			groupRatingEstimationStrategy = AggregationStrategies.valueOf(config.getString(GeneralProperties.GROUP_RATING_ESTIMATION_STRATEGY.getPropertyName())).get();
 
 			logger.info("File loaded: TRADGRecPAConfigs [ grec.singleUserRecommender= "+singleUserRecommender.toString()
@@ -112,6 +124,18 @@ public abstract class TRADGRecPAConfigs <T extends SURItem> extends GRecConfigs{
 	
 	public AggregationStrategy getGroupRatingEstimationStrategy(){
 		return groupRatingEstimationStrategy;
+	}
+
+	public double getPfBeta(){
+		return pf_beta;
+	}
+
+	public double getPfGamma(){
+		return pf_gamma;
+	}
+
+	public double getPfDelta(){
+		return pf_delta;
 	}
 
 	@Override
