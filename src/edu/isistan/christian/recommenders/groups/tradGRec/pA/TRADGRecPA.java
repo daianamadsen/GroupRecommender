@@ -32,6 +32,8 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	
 	protected AggregationStrategy aggregationStrategy;
 
+	protected double pf_alpha, pf_beta, pf_gamma, pf_delta;
+
 	public TRADGRecPA(TRADGRecPAConfigs<T> configs){
 		super(configs.getSUR(), configs.getGroupRatingEstimationStrategy());
 		this.aggregationStrategy = configs.getAggregationStrategy();
@@ -134,6 +136,9 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 	protected List<SURRating> getGroupRatings (GRecGroup group, HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) throws SURInexistentUserException{
 		List<SURRating> groupRatings = new ArrayList<>();
 
+		//Initialize Personality Factors
+		this.initializePersonalityFactors(assertivenessFactors, cooperativenessFactors, relationshipsFactors);
+
 		//Get the full list of the items rated by the group members and estimate the group rating
 		Set<T> allItemsRated = new HashSet<>();  //we use a set to avoid adding repeated id's if we don't check if they were already added
 		for (SURUser member : group){
@@ -142,7 +147,7 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 
 		//Aggregate the ratings and create a RatableItemFeedback
 		for (T m : allItemsRated){
-			Double totalWeights = 0.0;
+			int otherMembers = (group.size()-1 == 0) ? 1 : group.size()-1;
 			List<Double> mRatings = new ArrayList<>();
 			List<Double> mCertainty = new ArrayList<>();
 			for (SURUser member : group){
@@ -150,23 +155,21 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 					SURPrediction<T> p = singleUserRecommender.estimatePreference(member, m);
 					if (p.isValid())
 						if (!Double.isNaN(p.getPrediction()) && !Double.isNaN(p.getCertainty())){
-							Double estimatedRating = singleUserRecommender.estimateUserRating(p);
-							Double weight = 1.0;
+							Double rating = pf_alpha * singleUserRecommender.estimateUserRating(p);
 							if (assertivenessFactors != null) {
-								weight = weight * assertivenessFactors.get(member);
+								rating = rating + pf_beta * assertivenessFactors.get(member);
 							}
 							for (SURUser otherMember : group) {
 								if (otherMember != member) {
 									if (cooperativenessFactors != null) {
-										weight = weight * cooperativenessFactors.get(otherMember);
+										rating = rating + pf_gamma * cooperativenessFactors.get(otherMember) / otherMembers;
 									}
 									if (relationshipsFactors != null) {
-										weight = weight * relationshipsFactors.get(member).get(otherMember);
+										rating = rating + pf_delta * relationshipsFactors.get(member).get(otherMember) / otherMembers;
 									}
 								}
 							}
-							totalWeights = totalWeights + weight;
-							mRatings.add(estimatedRating * weight);
+							mRatings.add(rating);
 							mCertainty.add(p.getCertainty());
 						}
 						else
@@ -178,22 +181,35 @@ public abstract class TRADGRecPA <T extends SURItem> extends TRADGRec<T> {
 				}
 
 			}
-			double aggregatedRating = 0.0;
-			if (assertivenessFactors != null || cooperativenessFactors != null || relationshipsFactors != null) {
-				//Aggregation Strategy: Weighted Average
-				for (Double mr : mRatings) {
-					aggregatedRating = aggregatedRating + mr;
-				}
-				aggregatedRating = aggregatedRating / totalWeights;
-			} else {
-				//Aggregation Strategy: Config Setting
-				aggregatedRating = aggregationStrategy.aggregate(mRatings);
-			}
+
+			double aggregatedRating = aggregationStrategy.aggregate(mRatings);
 			double aggregatedCertainty = aggregationStrategy.aggregate(mCertainty);
 			groupRatings.add(new SURRating(group.getID(), m.getID(), aggregatedRating, aggregatedCertainty));		
 		}
 
 		return groupRatings;
+	}
+
+	private void initializePersonalityFactors (HashMap<SURUser, Double> assertivenessFactors, HashMap<SURUser, Double> cooperativenessFactors, HashMap<SURUser, HashMap<SURUser, Double>> relationshipsFactors) {
+		this.pf_alpha = 1; //initial value
+		this.pf_beta = configs.getPfBeta();
+		this.pf_gamma = configs.getPfGamma();
+		this.pf_delta = configs.getPfDelta();
+		if (assertivenessFactors != null) {
+			this.pf_alpha = this.pf_alpha - this.pf_beta;
+		} else {
+			this.pf_beta = 0;
+		}
+		if (cooperativenessFactors != null) {
+			this.pf_alpha = this.pf_alpha - this.pf_gamma;
+		} else {
+			this.pf_gamma = 0;
+		}
+		if (relationshipsFactors != null) {
+			this.pf_alpha = this.pf_alpha - this.pf_delta;
+		} else {
+			this.pf_delta = 0;
+		}
 	}
 
 	//Maybe this method is not needed
