@@ -80,7 +80,10 @@ public abstract class PUMASConfigs<T extends SURItem> extends GRecConfigs{
 		ALREADY_RATED_PUNISHMENT_MINSATISFACTIONVALUE ("pumas.users.monotonicConcession.AlreadyRatedPunishmentStrategy.minSatisfactionValue"),
 		PROPOSAL_ACCEPTANCE_STRATEGY ("pumas.users.monotonicConcession.proposalAcceptanceStrategy"),
 		PROPOSAL_ACCEPTANCE_RELAX_LEVEL ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.relaxed_s.relaxLevel"),
-		PROPOSAL_ACCEPTANCE_RELAX_PERCENTAGE ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.relaxed.relaxPercentage");
+		PROPOSAL_ACCEPTANCE_RELAX_PERCENTAGE ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.relaxed.relaxPercentage"),
+		PROPOSAL_ACCEPTANCE_PF_BETA ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.pf.beta"),
+		PROPOSAL_ACCEPTANCE_PF_GAMMA ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.pf.gamma"),
+		PROPOSAL_ACCEPTANCE_PF_DELTA ("pumas.users.monotonicConcession.proposalAcceptanceStrategy.pf.delta");
 
 
 		private String propertyName;
@@ -248,12 +251,22 @@ public abstract class PUMASConfigs<T extends SURItem> extends GRecConfigs{
 				break;
 			}
 			
+			double pf_beta = config.getDouble(UsersProperties.PROPOSAL_ACCEPTANCE_PF_BETA.getPropertyName());
+			double pf_gamma = config.getDouble(UsersProperties.PROPOSAL_ACCEPTANCE_PF_GAMMA.getPropertyName());
+			double pf_delta = config.getDouble(UsersProperties.PROPOSAL_ACCEPTANCE_PF_DELTA.getPropertyName());
+			
+			if (pf_beta + pf_gamma + pf_delta >= 1)
+					throw new IllegalArgumentException ("beta, gamma and delta parameters must add up to less than 1");
+			
 			//* Proposal Acceptance Strategy
 			ProposalAcceptanceStrategies propAcceptStrategy = ProposalAcceptanceStrategies.valueOf(config.getString(UsersProperties.PROPOSAL_ACCEPTANCE_STRATEGY.getPropertyName()));
 			switch (propAcceptStrategy){
 			case STRICT:
 				@SuppressWarnings("unchecked")
 				ProposalAcceptanceStrategyStrict<T> propAcceptStrict = (ProposalAcceptanceStrategyStrict<T>) propAcceptStrategy.get();
+				propAcceptStrict.setPfBeta(pf_beta);
+				propAcceptStrict.setPfGamma(pf_gamma);
+				propAcceptStrict.setPfDelta(pf_delta);
 
 				this.agDefaultProfile.setPropAcceptanceStrategy(propAcceptStrict);
 				break;
