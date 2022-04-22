@@ -50,8 +50,9 @@ public abstract class PUMASConfigs<T extends SURItem> extends GRecConfigs{
 		MULTILATERAL_CONCESSION_STRATEGY ("pumas.protocol.monotonicConcession.multilateralConcessionStrategy"),
 		AGREEMENT_STRATEGY ("pumas.protocol.monotonicConcession.agreementStrategy"),
 		NEGOTIATION_STRATEGY ("pumas.protocol.monotonicConcession.negotiationStrategy"),
-		COORDINATOR_TYPE ("pumas.protocol.monotonicConcession.coordinatorType");
-
+		COORDINATOR_TYPE ("pumas.protocol.monotonicConcession.coordinatorType"),
+		NEGOTIATION_STRATEGY_PF_BETA ("pumas.protocol.monotonicConcession.negotiationStrategy.pf.beta"),
+		NEGOTIATION_STRATEGY_PF_GAMMA ("pumas.protocol.monotonicConcession.negotiationStrategy.pf.gamma");
 
 		private String propertyName;
 		ProtocolProperties (String propertyName){
@@ -264,18 +265,18 @@ public abstract class PUMASConfigs<T extends SURItem> extends GRecConfigs{
 			case STRICT:
 				@SuppressWarnings("unchecked")
 				ProposalAcceptanceStrategyStrict<T> propAcceptStrict = (ProposalAcceptanceStrategyStrict<T>) propAcceptStrategy.get();
-				propAcceptStrict.setPfBeta(pa_pf_beta);
-				propAcceptStrict.setPfGamma(pa_pf_gamma);
-				propAcceptStrict.setPfDelta(pa_pf_delta);
+				//propAcceptStrict.setPfBeta(pa_pf_beta);
+				//propAcceptStrict.setPfGamma(pa_pf_gamma);
+				//propAcceptStrict.setPfDelta(pa_pf_delta);
 				this.agDefaultProfile.setPropAcceptanceStrategy(propAcceptStrict);
 				break;
 			case RELAXED:
 				@SuppressWarnings("unchecked") ProposalAcceptanceStrategyRelaxed<T> prARelaxed = (ProposalAcceptanceStrategyRelaxed<T>) propAcceptStrategy.get();
 				double relaxPercentage = config.getDouble(UsersProperties.PROPOSAL_ACCEPTANCE_RELAX_PERCENTAGE.getPropertyName());
 				prARelaxed.setRelaxationLevel(relaxPercentage);
-				prARelaxed.setPfBeta(pa_pf_beta);
-				prARelaxed.setPfGamma(pa_pf_gamma);
-				prARelaxed.setPfDelta(pa_pf_delta);
+				//prARelaxed.setPfBeta(pa_pf_beta);
+				//prARelaxed.setPfGamma(pa_pf_gamma);
+				//prARelaxed.setPfDelta(pa_pf_delta);
 				this.agDefaultProfile.setPropAcceptanceStrategy(prARelaxed);
 				break;
 			case RELAXED_S:
@@ -283,17 +284,17 @@ public abstract class PUMASConfigs<T extends SURItem> extends GRecConfigs{
 				ProposalAcceptanceStrategyRelaxedS<T> prARelaxed_S = (ProposalAcceptanceStrategyRelaxedS<T>) propAcceptStrategy.get();
 				RelaxLevel relaxLevel = RelaxLevel.valueOf(config.getString(UsersProperties.PROPOSAL_ACCEPTANCE_RELAX_LEVEL.getPropertyName()));
 				prARelaxed_S.setRelaxationLevel(relaxLevel);
-				prARelaxed_S.setPfBeta(pa_pf_beta);
-				prARelaxed_S.setPfGamma(pa_pf_gamma);
-				prARelaxed_S.setPfDelta(pa_pf_delta);
+				//prARelaxed_S.setPfBeta(pa_pf_beta);
+				//prARelaxed_S.setPfGamma(pa_pf_gamma);
+				//prARelaxed_S.setPfDelta(pa_pf_delta);
 				this.agDefaultProfile.setPropAcceptanceStrategy(prARelaxed_S);
 				break;
 			case NEXT:
 				@SuppressWarnings("unchecked") ProposalAcceptanceStrategyNext<T> propAcceptNext = (ProposalAcceptanceStrategyNext<T>) propAcceptStrategy.get();
 				this.agDefaultProfile.setPropAcceptanceStrategy(propAcceptNext);
-				propAcceptNext.setPfBeta(pa_pf_beta);
-				propAcceptNext.setPfGamma(pa_pf_gamma);
-				propAcceptNext.setPfDelta(pa_pf_delta);
+				//propAcceptNext.setPfBeta(pa_pf_beta);
+				//propAcceptNext.setPfGamma(pa_pf_gamma);
+				//propAcceptNext.setPfDelta(pa_pf_delta);
 				break;
 			default:
 				break;
